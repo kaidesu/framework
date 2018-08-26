@@ -1921,10 +1921,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function __get($key)
     {
-        if (! in_array($key, static::$proxies)) {
-            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+        if (in_array($key, static::$proxies)) {
+            return new HigherOrderCollectionProxy($this, $key);
         }
 
-        return new HigherOrderCollectionProxy($this, $key);
+        if (array_key_exists($key, $this->items)) {
+            return $this->items[$key];
+        }
+
+        throw new Exception("Property [{$key}] does not exist on this collection instance.");
     }
 }
